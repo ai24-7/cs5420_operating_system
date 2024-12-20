@@ -1,0 +1,5 @@
+#!/bin/sh
+TESTNAME="$0"
+ARGS="testdir -type f -size +100c"
+
+./runtest $TESTNAME $ARGS

@@ -1,0 +1,19 @@
+#!/bin/sh
+TESTNAME="$0"
+ARGS="testdir -name"
+
+cat << EOF > ${TESTNAME}.correct
+-name requires argument
+EOF
+
+# don't change anything else
+echo "Running command: ./find" $ARGS
+./find ${ARGS} > ${TESTNAME}.myoutput 2>&1
+if cmp -s ${TESTNAME}.correct ${TESTNAME}.myoutput; then
+    echo "+++ PASSES ${TESTNAME}"; 
+    exit 0
+else
+    echo "--- FAILS ${TESTNAME}"; 
+    diff ${TESTNAME}.correct ${TESTNAME}.myoutput | cat -vet
+    exit 99
+fi

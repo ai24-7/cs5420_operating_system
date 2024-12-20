@@ -1,0 +1,77 @@
+#!/bin/bash
+#
+# students must NOT change this file in any way!!!
+PATH=/bin:/usr/bin
+TEST=$0
+
+# I need this routine
+cat > tmp.stat << 'END'
+#!/bin/sh
+PATH=/bin:/usr/bin
+for FILE in $*; do
+        /bin/echo "`ls -l $FILE | colrm 11` `wc $FILE | awk '{printf(\"%6s %6s %6s %s\n\", $1, $2, $3, $4);}'`"
+done       
+END
+chmod a+rx tmp.stat
+
+#
+# make sure the umask is at the default
+umask 0022
+
+# this is the input lines to use
+cat > $0.input << 'END'
+echo STARTING
+
+echo "And List and Or List test"
+
+true && /bin/echo works
+true || /bin/echo fails
+false && /bin/echo fails
+false || /bin/echo works
+
+true && false || true && /bin/echo works
+true && false && true && /bin/echo fails
+
+echo "Does it work for built-in commands?"
+true  && echo works2
+true  || echo fails2
+false && echo fails2
+false || echo works2
+
+echo "These are also valid"
+grep -q STARTING < test.0 > /tmp/out && /bin/echo redir works < /dev/null
+grep -q NOTTHERE < test.0 > /tmp/out && /bin/echo redir fails < /dev/null
+cat test.0 | tr 'A-Z' 'a-z' | grep -q starting && /bin/echo long redir works < /dev/null
+cat test.0 | tr 'A-Z' 'a-z' | grep -q notthere && /bin/echo long redir fails < /dev/null
+
+
+END
+
+# this is the correct output
+# this is the output they should create
+cat > $TEST.correct << 'END'
+And List and Or List test
+works
+works
+works
+Does it work for built-in commands?
+works2
+works2
+These are also valid
+redir works
+long redir works
+END
+
+# don't change anything else
+echo "export PS1=''; umask 0022; ./bash < $0.input; exit" | script -q > /dev/null 2>&1
+sed 's/\r//g' typescript | grep STARTING -A 100000 | grep -v STARTING | awk '/exit/{exit} {print}' | grep  -v '^Script done' | egrep -v '^$' > $TEST.myoutput
+
+
+if cmp -s $TEST.correct $TEST.myoutput; then
+    echo "PASSES"; exit 0
+else
+    echo "FAILS"; 
+    echo '==== output differences: < means the CORRECT output, > means YOUR output'
+    diff $TEST.correct $TEST.myoutput
+    exit 99
+fi

@@ -1,0 +1,541 @@
+Grammar
+
+    0 $accept: input $end
+
+    1 input: lines
+    2      | /* empty */
+
+    3 lines: oneline
+    4      | oneline lines
+
+    5 oneline: line eoln
+    6        | eoln
+    7        | error eoln
+
+    8 eoln: EOLN
+
+    9 line: andor_list
+
+   10 andor_list: and_list
+   11           | andor_list OR and_list
+
+   12 and_list: pipe_list
+   13         | and_list AND pipe_list
+
+   14 pipe_list: cmd
+   15          | cmd PIPE pipe_list
+
+   16 cmd: WORD optargs optredirs
+   17    | VAR_QUOTE
+   18    | VAR
+
+   19 optargs: arg optargs
+   20        | /* empty */
+
+   21 arg: WORD
+   22    | VAR_WORD
+
+   23 optredirs: redir optredirs
+   24          | /* empty */
+
+   25 redir: INFILE WORD
+   26      | INFILE VAR_WORD
+   27      | OUTFILE WORD
+   28      | OUTFILE VAR_WORD
+   29      | OUTFILE_APPEND WORD
+   30      | OUTFILE_APPEND VAR_WORD
+   31      | errorLogFile WORD
+   32      | errorLogFile VAR_WORD
+   33      | errorLogFile_APPEND WORD
+   34      | errorLogFile_APPEND VAR_WORD
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+error (256) 7
+EOLN (258) 8
+PIPE (259) 15
+AND (260) 13
+OR (261) 11
+INFILE (262) 25 26
+errorLogFile (263) 31 32
+errorLogFile_APPEND (264) 33 34
+OUTFILE (265) 27 28
+OUTFILE_APPEND (266) 29 30
+WORD (267) 16 21 25 27 29 31 33
+VAR_QUOTE (268) 17
+VAR_WORD (269) 22 26 28 30 32 34
+VAR (270) 18
+
+
+Nonterminals, with rules where they appear
+
+$accept (16)
+    on left: 0
+input (17)
+    on left: 1 2, on right: 0
+lines (18)
+    on left: 3 4, on right: 1 4
+oneline (19)
+    on left: 5 6 7, on right: 3 4
+eoln (20)
+    on left: 8, on right: 5 6 7
+line (21)
+    on left: 9, on right: 5
+andor_list (22)
+    on left: 10 11, on right: 9 11
+and_list (23)
+    on left: 12 13, on right: 10 11 13
+pipe_list (24)
+    on left: 14 15, on right: 12 13 15
+cmd (25)
+    on left: 16 17 18, on right: 14 15
+optargs (26)
+    on left: 19 20, on right: 16 19
+arg (27)
+    on left: 21 22, on right: 19
+optredirs (28)
+    on left: 23 24, on right: 16 23
+redir (29)
+    on left: 25 26 27 28 29 30 31 32 33 34, on right: 23
+
+
+state 0
+
+    0 $accept: . input $end
+
+    error      shift, and go to state 1
+    EOLN       shift, and go to state 2
+    WORD       shift, and go to state 3
+    VAR_QUOTE  shift, and go to state 4
+    VAR        shift, and go to state 5
+
+    $end  reduce using rule 2 (input)
+
+    input       go to state 6
+    lines       go to state 7
+    oneline     go to state 8
+    eoln        go to state 9
+    line        go to state 10
+    andor_list  go to state 11
+    and_list    go to state 12
+    pipe_list   go to state 13
+    cmd         go to state 14
+
+
+state 1
+
+    7 oneline: error . eoln
+
+    EOLN  shift, and go to state 2
+
+    eoln  go to state 15
+
+
+state 2
+
+    8 eoln: EOLN .
+
+    $default  reduce using rule 8 (eoln)
+
+
+state 3
+
+   16 cmd: WORD . optargs optredirs
+
+    WORD      shift, and go to state 16
+    VAR_WORD  shift, and go to state 17
+
+    $default  reduce using rule 20 (optargs)
+
+    optargs  go to state 18
+    arg      go to state 19
+
+
+state 4
+
+   17 cmd: VAR_QUOTE .
+
+    $default  reduce using rule 17 (cmd)
+
+
+state 5
+
+   18 cmd: VAR .
+
+    $default  reduce using rule 18 (cmd)
+
+
+state 6
+
+    0 $accept: input . $end
+
+    $end  shift, and go to state 20
+
+
+state 7
+
+    1 input: lines .
+
+    $default  reduce using rule 1 (input)
+
+
+state 8
+
+    3 lines: oneline .
+    4      | oneline . lines
+
+    error      shift, and go to state 1
+    EOLN       shift, and go to state 2
+    WORD       shift, and go to state 3
+    VAR_QUOTE  shift, and go to state 4
+    VAR        shift, and go to state 5
+
+    $end  reduce using rule 3 (lines)
+
+    lines       go to state 21
+    oneline     go to state 8
+    eoln        go to state 9
+    line        go to state 10
+    andor_list  go to state 11
+    and_list    go to state 12
+    pipe_list   go to state 13
+    cmd         go to state 14
+
+
+state 9
+
+    6 oneline: eoln .
+
+    $default  reduce using rule 6 (oneline)
+
+
+state 10
+
+    5 oneline: line . eoln
+
+    EOLN  shift, and go to state 2
+
+    eoln  go to state 22
+
+
+state 11
+
+    9 line: andor_list .
+   11 andor_list: andor_list . OR and_list
+
+    OR  shift, and go to state 23
+
+    $default  reduce using rule 9 (line)
+
+
+state 12
+
+   10 andor_list: and_list .
+   13 and_list: and_list . AND pipe_list
+
+    AND  shift, and go to state 24
+
+    $default  reduce using rule 10 (andor_list)
+
+
+state 13
+
+   12 and_list: pipe_list .
+
+    $default  reduce using rule 12 (and_list)
+
+
+state 14
+
+   14 pipe_list: cmd .
+   15          | cmd . PIPE pipe_list
+
+    PIPE  shift, and go to state 25
+
+    $default  reduce using rule 14 (pipe_list)
+
+
+state 15
+
+    7 oneline: error eoln .
+
+    $default  reduce using rule 7 (oneline)
+
+
+state 16
+
+   21 arg: WORD .
+
+    $default  reduce using rule 21 (arg)
+
+
+state 17
+
+   22 arg: VAR_WORD .
+
+    $default  reduce using rule 22 (arg)
+
+
+state 18
+
+   16 cmd: WORD optargs . optredirs
+
+    INFILE               shift, and go to state 26
+    errorLogFile         shift, and go to state 27
+    errorLogFile_APPEND  shift, and go to state 28
+    OUTFILE              shift, and go to state 29
+    OUTFILE_APPEND       shift, and go to state 30
+
+    $default  reduce using rule 24 (optredirs)
+
+    optredirs  go to state 31
+    redir      go to state 32
+
+
+state 19
+
+   19 optargs: arg . optargs
+
+    WORD      shift, and go to state 16
+    VAR_WORD  shift, and go to state 17
+
+    $default  reduce using rule 20 (optargs)
+
+    optargs  go to state 33
+    arg      go to state 19
+
+
+state 20
+
+    0 $accept: input $end .
+
+    $default  accept
+
+
+state 21
+
+    4 lines: oneline lines .
+
+    $default  reduce using rule 4 (lines)
+
+
+state 22
+
+    5 oneline: line eoln .
+
+    $default  reduce using rule 5 (oneline)
+
+
+state 23
+
+   11 andor_list: andor_list OR . and_list
+
+    WORD       shift, and go to state 3
+    VAR_QUOTE  shift, and go to state 4
+    VAR        shift, and go to state 5
+
+    and_list   go to state 34
+    pipe_list  go to state 13
+    cmd        go to state 14
+
+
+state 24
+
+   13 and_list: and_list AND . pipe_list
+
+    WORD       shift, and go to state 3
+    VAR_QUOTE  shift, and go to state 4
+    VAR        shift, and go to state 5
+
+    pipe_list  go to state 35
+    cmd        go to state 14
+
+
+state 25
+
+   15 pipe_list: cmd PIPE . pipe_list
+
+    WORD       shift, and go to state 3
+    VAR_QUOTE  shift, and go to state 4
+    VAR        shift, and go to state 5
+
+    pipe_list  go to state 36
+    cmd        go to state 14
+
+
+state 26
+
+   25 redir: INFILE . WORD
+   26      | INFILE . VAR_WORD
+
+    WORD      shift, and go to state 37
+    VAR_WORD  shift, and go to state 38
+
+
+state 27
+
+   31 redir: errorLogFile . WORD
+   32      | errorLogFile . VAR_WORD
+
+    WORD      shift, and go to state 39
+    VAR_WORD  shift, and go to state 40
+
+
+state 28
+
+   33 redir: errorLogFile_APPEND . WORD
+   34      | errorLogFile_APPEND . VAR_WORD
+
+    WORD      shift, and go to state 41
+    VAR_WORD  shift, and go to state 42
+
+
+state 29
+
+   27 redir: OUTFILE . WORD
+   28      | OUTFILE . VAR_WORD
+
+    WORD      shift, and go to state 43
+    VAR_WORD  shift, and go to state 44
+
+
+state 30
+
+   29 redir: OUTFILE_APPEND . WORD
+   30      | OUTFILE_APPEND . VAR_WORD
+
+    WORD      shift, and go to state 45
+    VAR_WORD  shift, and go to state 46
+
+
+state 31
+
+   16 cmd: WORD optargs optredirs .
+
+    $default  reduce using rule 16 (cmd)
+
+
+state 32
+
+   23 optredirs: redir . optredirs
+
+    INFILE               shift, and go to state 26
+    errorLogFile         shift, and go to state 27
+    errorLogFile_APPEND  shift, and go to state 28
+    OUTFILE              shift, and go to state 29
+    OUTFILE_APPEND       shift, and go to state 30
+
+    $default  reduce using rule 24 (optredirs)
+
+    optredirs  go to state 47
+    redir      go to state 32
+
+
+state 33
+
+   19 optargs: arg optargs .
+
+    $default  reduce using rule 19 (optargs)
+
+
+state 34
+
+   11 andor_list: andor_list OR and_list .
+   13 and_list: and_list . AND pipe_list
+
+    AND  shift, and go to state 24
+
+    $default  reduce using rule 11 (andor_list)
+
+
+state 35
+
+   13 and_list: and_list AND pipe_list .
+
+    $default  reduce using rule 13 (and_list)
+
+
+state 36
+
+   15 pipe_list: cmd PIPE pipe_list .
+
+    $default  reduce using rule 15 (pipe_list)
+
+
+state 37
+
+   25 redir: INFILE WORD .
+
+    $default  reduce using rule 25 (redir)
+
+
+state 38
+
+   26 redir: INFILE VAR_WORD .
+
+    $default  reduce using rule 26 (redir)
+
+
+state 39
+
+   31 redir: errorLogFile WORD .
+
+    $default  reduce using rule 31 (redir)
+
+
+state 40
+
+   32 redir: errorLogFile VAR_WORD .
+
+    $default  reduce using rule 32 (redir)
+
+
+state 41
+
+   33 redir: errorLogFile_APPEND WORD .
+
+    $default  reduce using rule 33 (redir)
+
+
+state 42
+
+   34 redir: errorLogFile_APPEND VAR_WORD .
+
+    $default  reduce using rule 34 (redir)
+
+
+state 43
+
+   27 redir: OUTFILE WORD .
+
+    $default  reduce using rule 27 (redir)
+
+
+state 44
+
+   28 redir: OUTFILE VAR_WORD .
+
+    $default  reduce using rule 28 (redir)
+
+
+state 45
+
+   29 redir: OUTFILE_APPEND WORD .
+
+    $default  reduce using rule 29 (redir)
+
+
+state 46
+
+   30 redir: OUTFILE_APPEND VAR_WORD .
+
+    $default  reduce using rule 30 (redir)
+
+
+state 47
+
+   23 optredirs: redir optredirs .
+
+    $default  reduce using rule 23 (optredirs)

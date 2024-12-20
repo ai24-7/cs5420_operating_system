@@ -1,0 +1,32 @@
+# Basic -ls tests
+testdir -ls
+testdir/dir1 -ls
+testdir/dir1/subdir1 -ls
+
+# Wildcard name matching
+testdir -name "*.txt"
+testdir -name "gf*"
+testdir -iname "GF*"
+
+# Extended size specifications
+testdir -size +1M
+testdir -size -2M
+testdir -size 1M
+
+# Time-based filters
+testdir -mtime +1
+testdir -mtime -1
+testdir -mmin +30
+testdir -mmin -30
+
+# Depth control
+testdir -depth 1
+testdir -depth 2
+
+# Newer than comparisons
+testdir -newer testdir/dir1/gf100
+
+# Combinations
+testdir -type f -name "*.txt" -size +1M -ls
+testdir -type d -depth 2 -ls
+testdir -iname "GF*" -mtime -1 -ls

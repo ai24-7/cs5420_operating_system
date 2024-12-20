@@ -1,0 +1,5 @@
+#!/bin/sh
+TESTNAME="$0"
+ARGS="testdir -type d -name subsubdir3"
+
+./runtest $TESTNAME $ARGS
